@@ -1,0 +1,19 @@
+{
+  "name": "hello_world_app",
+  "version": "1.0.0",
+  "description": "This is our first Express app",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hello_world",
+    "first_app"
+  ],
+  "author": "Semos Academy",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.2",
+    "nodemon": "^2.0.15"
+  }
+}

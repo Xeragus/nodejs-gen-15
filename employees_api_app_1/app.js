@@ -26,9 +26,17 @@ const employees = [];
 // Naming of routes: Resource-based
 app
   .get('/employees', (req, res) => {
+    let filteredEmployees = employees;
+
+    if (req.query.job_title) {
+      filteredEmployees = employees.filter(employee => {
+        return employee.job_title.toLowerCase() == req.query.job_title.toLowerCase()
+      })
+    }
+
     res.send({
       message: 'List of all employees',
-      employees: employees
+      employees: filteredEmployees
     })
   })
   .get('/employees/:job_title', (req, res) => {

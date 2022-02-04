@@ -6,9 +6,8 @@ const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const employeesRouter = require('./routes/employees');
+const companiesRouter = require('./routes/companies');
 const mongoose = require('mongoose');
-
-// MVC: Model View Controller
 
 const app = express();
 mongoose.connect('mongodb://localhost:27017/employees-app-gen-15');
@@ -26,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/employees', employeesRouter);
+app.use('/companies', companiesRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

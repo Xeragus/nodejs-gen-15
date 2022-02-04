@@ -3,6 +3,7 @@ var router = express.Router();
 const Employee = require('../models/employee');
 
 // CRUD operations: Create Read Update Delete
+// TODO: Refactor, delegate to controller
 
 router.get('/', async (req, res) => {
         // TODO: Should return all employees
@@ -11,7 +12,7 @@ router.get('/', async (req, res) => {
           const employees = await Employee.find({
             first_name: req.query.first_name,
             last_name: req.query.last_name
-          });
+          }).populate('company');
 
           res.send({
             error: false,
@@ -21,7 +22,7 @@ router.get('/', async (req, res) => {
           return;
         }
 
-        const employees = await Employee.find();
+        const employees = await Employee.find().populate('company', 'name');
 
         res.send({
           error: false,
@@ -37,6 +38,16 @@ router.get('/', async (req, res) => {
           error: false,
           message: `Employee with id #${employee._id}, named ${employee.first_name} ${employee.last_name}, has been fetched`,
           employee: employee
+        });
+      })
+      .get('/:id/company', async (req, res) => {
+        // TODO: Return one employee's company by employee id
+        const employee = await Employee.findById(req.params.id).populate('company');
+
+        res.send({
+          error: false,
+          message: `Company of employee with id #${employee._id} has been fetched`,
+          company: employee.company
         });
       })
       .post('/', async (req, res) => {

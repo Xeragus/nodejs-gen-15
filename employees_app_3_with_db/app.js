@@ -5,6 +5,8 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const employeesAPIRouter = require('./routes/api/employees');
+const companiesAPIRouter = require('./routes/api/companies');
 const employeesRouter = require('./routes/employees');
 const companiesRouter = require('./routes/companies');
 const mongoose = require('mongoose');
@@ -24,6 +26,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+
+app.use('/api/employees', employeesAPIRouter);
+app.use('/api/companies', companiesAPIRouter);
 app.use('/employees', employeesRouter);
 app.use('/companies', companiesRouter);
 

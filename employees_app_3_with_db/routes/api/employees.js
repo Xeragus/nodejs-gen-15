@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const controller = require('../controllers/employees');
+const controller = require('../../controllers/api/employees');
 
 // CRUD operations: Create Read Update Delete
 // TODO: Refactor, delegate to controller

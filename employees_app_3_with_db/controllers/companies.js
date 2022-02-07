@@ -1,26 +1,23 @@
 const Company = require('../models/company')
 
-const getAllCompanies = async (req, res) => {
+const getAll = async (req, res) => {
   const companies = await Company.find();
 
-  res.send({
-    error: false,
-    message: 'All companies from the database',
-    companies: companies
-  });
+  res.render('companies/index', { companies });
 };
 
-const getCompanyCreate = async (req, res) => {
-  const company = await Company.create(req.body);
-
-  res.send({
-    error: false,
-    message: 'New company has been created',
-    company: company
-  });
+const getCreate = (req, res) => {
+  res.render('companies/create');
 };
 
-const getCompanyUpdate = async (req, res) => {
+const postCreate = async (req, res) => {
+  console.log(req.body);
+  await Company.create(req.body);
+
+  res.redirect('/companies');
+};
+
+const getUpdate = async (req, res) => {
   await Company.findByIdAndUpdate(req.params.id, req.body);
   const company = await Company.findById(req.params.id);
 
@@ -31,7 +28,7 @@ const getCompanyUpdate = async (req, res) => {
   });
 };
 
-const getCompaniesDeleted = async (req, res) => {
+const getDeleted = async (req, res) => {
   await Company.findByIdAndDelete(req.params.id);
   
   res.send({
@@ -41,8 +38,9 @@ const getCompaniesDeleted = async (req, res) => {
 };
 
 module.exports = {
-  getAllCompanies,
-  getCompanyCreate,
-  getCompanyUpdate,
-  getCompaniesDeleted
+  getAll,
+  getCreate,
+  postCreate,
+  getUpdate,
+  getDeleted
 }

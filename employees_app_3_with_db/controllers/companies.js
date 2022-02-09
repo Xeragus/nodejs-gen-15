@@ -10,6 +10,12 @@ const getCreate = (req, res) => {
   res.render('companies/create');
 };
 
+const getEdit = async (req, res) => {
+  const company = await Company.findById(req.params.id);
+
+  res.render('companies/edit', { company });
+}
+
 const postCreate = async (req, res) => {
   console.log(req.body);
   await Company.create(req.body);
@@ -17,30 +23,23 @@ const postCreate = async (req, res) => {
   res.redirect('/companies');
 };
 
-const getUpdate = async (req, res) => {
+const update = async (req, res) => {
   await Company.findByIdAndUpdate(req.params.id, req.body);
-  const company = await Company.findById(req.params.id);
 
-  res.send({
-    error: false,
-    message: `Company with id #${company._id} has been updated`,
-    company: company
-  });
+  res.redirect('/companies');
 };
 
-const getDeleted = async (req, res) => {
+const destroy = async (req, res) => {
   await Company.findByIdAndDelete(req.params.id);
-  
-  res.send({
-    error: false,
-    message: `Company with id #${req.params.id} has been deleted`
-  });
+
+  res.status(200).send({});
 };
 
 module.exports = {
   getAll,
   getCreate,
+  getEdit,
   postCreate,
-  getUpdate,
-  getDeleted
+  update,
+  destroy
 }

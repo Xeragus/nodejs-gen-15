@@ -50,7 +50,13 @@
             </th>
             <td><%= employee.first_name + ' ' + employee.last_name %></td>
             <td><%= employee.position %></td>
-            <td><%= employee.company ? employee.company.name : 'Unemployed' %></td>
+            <td>
+              <% if (employee.company) { %>
+               <a href="/companies/<%= employee.company._id %>/view"><%= employee.company.name %></a>
+              <% } else { %>
+                Unemployed
+              <% } %>
+            </td>
             <td>
               <a class="btn btn-warning" href="/employees/<%= employee._id %>">
                 Edit

@@ -45,7 +45,7 @@
         <% companies.forEach(company => { %>
           <tr>
             <th scope="row">
-              <a href="/companies/<%= company._id %>"><%= company._id %></a>
+              <a href="/companies/<%= company._id %>/view"><%= company._id %></a>
             </th>
             <td><%= company.name %></td>
             <td><%= company.address %></td>

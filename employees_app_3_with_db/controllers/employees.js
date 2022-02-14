@@ -43,7 +43,13 @@ module.exports = {
       req.body.company = null;
     }
 
-    await Employee.create(req.body);
+    const employee = await Employee.create(req.body);
+
+    if (req.body.company) {
+      await Company.findByIdAndUpdate(req.body.company, {
+        $push: { employees: employee }
+      });
+    }
 
     res.redirect('/employees');
   },
@@ -52,12 +58,22 @@ module.exports = {
       req.body.company = null;
     }
 
-    await Employee.findByIdAndUpdate(req.params.id, req.body);
+    const employee = await Employee.findByIdAndUpdate(req.params.id, req.body);
+
+    if (req.body.company) {
+      let foundEmployees = await Company.find({ employees: employee });
+
+      if (foundEmployees.length == 0) {
+        await Company.findByIdAndUpdate(req.body.company, {
+          $push: { employees: employee }
+        });
+      }
+    }
 
     res.redirect('/employees');
   },
   delete: async (req, res) => {
-    await Employee.findByIdAndDelete(req.params.id);
+    await Employee.findByIdAndDelete(req.params.id); 
     
     res.send({});
   }

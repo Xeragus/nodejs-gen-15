@@ -8,6 +8,8 @@ const userRoute = require('./routes/userRoute');
 const importRoute = require('./routes/importRoute');
 const mongoose = require('mongoose');
 
+require('dotenv').config();
+
 const app = express();
 mongoose.connect('mongodb://localhost:27017/social-app');
 

@@ -4,13 +4,18 @@ const controller = require('../controllers/postController');
 const jwt = require('express-jwt');
 const response = require('../lib/response_handler');
 
+require('dotenv').config();
+
 router.use(jwt({
-      secret: '1234',
+      secret: process.env.JWT_SECRET_KEY,
       algorithms: ['HS256'] 
 }).unless({
       path: [
             {
                   url: '/posts', methods: ['GET']
+            },
+            {
+                  url: /^\/posts\/.*/, methods: ['GET'] // Read more about regex
             }
       ]
 }));

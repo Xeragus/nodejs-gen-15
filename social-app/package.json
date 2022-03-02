@@ -13,6 +13,7 @@
     "csv-reader": "^1.0.8",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "express-jwt": "^6.1.1",
     "fast-csv": "^4.3.6",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",

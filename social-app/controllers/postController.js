@@ -1,6 +1,9 @@
 const Post = require('../models/post');
+const axios = require('axios');
 
 const getAll = async (req, res) => {
+  const catApiResponse = await axios.get(`${process.env.CAT_API_URL}/facts`);
+  console.log(catApiResponse.data);
   
   const posts = await Post.find();
      
@@ -24,7 +27,6 @@ const getById = async (req, res) => {
 
 
 const postCreate = async (req, res) => {
-
   const post = await Post.create(req.body);
 
   res.send({

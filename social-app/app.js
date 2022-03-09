@@ -9,6 +9,7 @@ const importRoute = require('./routes/importRoute');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
+require('./jobs/cronjob');
 
 const app = express();
 mongoose.connect('mongodb://localhost:27017/social-app');

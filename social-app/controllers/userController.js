@@ -2,6 +2,7 @@ const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const response = require('../lib/response_handler');
 const jwt = require('jsonwebtoken');
+const Friendship = require('../models/friendship');
 
 /**
  * Authentication steps
@@ -99,6 +100,27 @@ const postUpdate = async (req, res) => {
   });
 };
 
+const addFriend = async (req, res) => {
+  console.log(req.user);
+  try {
+    const userTwo = await User.findById(req.params.id);
+  
+    if (!userTwo) {
+      response(res, 404, 'Cannot add to friends a user that doesn\'t exist.');
+      return;
+    }
+
+    const friendship = await Friendship.create({
+      user_one: req.user.id,
+      user_two: userTwo._id
+    })
+
+    response(res, 201, `User with id #${req.user.id} has added to friends user with id #${req.params.id}.`, { friendship })
+  } catch (error) {
+    response(res, 500, error.message, { error })
+  }
+}
+
 const getDeleted = async (req, res) => {
   await User.findByIdAndDelete(req.params.id);
 
@@ -114,5 +136,6 @@ module.exports = {
     register,
     login,
     postUpdate, 
+    addFriend,
     getDeleted
 }

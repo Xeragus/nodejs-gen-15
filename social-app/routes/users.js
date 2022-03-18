@@ -35,5 +35,6 @@ router.get('/', controller.getAll)
       .post('/:id/update', controller.postUpdate)
       .post('/:id/add-friend', controller.addFriend)
       .delete('/:id', controller.getDeleted)
+      .delete('/friend/:id', controller.deleteFriend)
 
 module.exports = router;

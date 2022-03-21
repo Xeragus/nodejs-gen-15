@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
-const Comment = require("../models/comment");
-const Post = require("../models/post");
+const mongoose = require('mongoose');
+const Comment = require('../models/comment');
+const Post = require('../models/post');
 
 const getAll = async (req, res) => {
   const comments = await Comment.find();
@@ -34,7 +34,7 @@ const postCreate = async (req, res) => {
 
   res.send({
     error: false,
-    message: "New comment has been created",
+    message: 'New comment has been created',
   });
 };
 

@@ -1,16 +1,16 @@
-const Post = require("../models/post");
-const Comment = require("../models/comment");
-const axios = require("axios");
-const responseHandler = require("../lib/response_handler");
-const AccessControl = require("accesscontrol");
+const Post = require('../models/post');
+const Comment = require('../models/comment');
+const axios = require('axios');
+const responseHandler = require('../lib/response_handler');
+const AccessControl = require('accesscontrol');
 const ac = new AccessControl();
 
 // Definiraj roles i sto mozat da pravat
-ac.grant("user").createOwn("post");
-ac.deny("admin").createOwn("post");
+ac.grant('user').createOwn('post');
+ac.deny('admin').createOwn('post');
 
 const getAll = async (req, res) => {
-  const posts = await Post.find().populate("comments", "content");
+  const posts = await Post.find().populate('comments', 'content');
 
   res.send({
     error: false,
@@ -30,7 +30,7 @@ const getById = async (req, res) => {
 };
 
 const postCreate = async (req, res) => {
-  const permission = ac.can(req.user.role).createOwn("post");
+  const permission = ac.can(req.user.role).createOwn('post');
 
   if (!permission.granted) {
     responseHandler(
@@ -45,7 +45,7 @@ const postCreate = async (req, res) => {
 
   res.send({
     error: false,
-    message: "New post has been created",
+    message: 'New post has been created',
     post: post,
   });
 };

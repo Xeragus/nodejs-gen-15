@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const controller = require('../controllers/postController');
+const controller = require('../controllers/posts');
 const jwt = require('express-jwt');
 const response = require('../lib/response_handler');
 

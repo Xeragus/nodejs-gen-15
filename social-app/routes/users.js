@@ -1,10 +1,9 @@
 var express = require('express');
 var router = express.Router();
-const controller = require('../controllers/userController');
+const controller = require('../controllers/users');
 const jwt = require('express-jwt');
 const response = require('../lib/response_handler');
-// PR (Pull Request) Example /// //
-// ss
+
 require('dotenv').config();
 
 router.use(

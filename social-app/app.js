@@ -3,15 +3,14 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const postRouter = require('./routes/posts');
-const userRouter = require('./routes/users');
-const commentRouter = require('./routes/comments');
-const importRouter = require('./routes/importRoute');
+const postsRouter = require('./routes/posts');
+const usersRouter = require('./routes/users');
+const commentsRouter = require('./routes/comments');
+const paymentsRouter = require('./routes/payments');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
 // require('./jobs/cronjob');
-// job scheduler
 
 const app = express();
 mongoose.connect('mongodb://localhost:27017/social-app');
@@ -22,10 +21,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/posts', postRouter);
-app.use('/users', userRouter);
-app.use('/comments', commentRouter);
-app.use('/import', importRouter);
+app.use('/posts', postsRouter);
+app.use('/users', usersRouter);
+app.use('/comments', commentsRouter);
+app.use('/payments', paymentsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

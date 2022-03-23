@@ -10,7 +10,7 @@ const paymentsRouter = require('./routes/payments');
 const productsRouter = require('./routes/products');
 const mongoose = require('mongoose');
 
-// require('dotenv').config();
+require('dotenv').config();
 // require('./jobs/cronjob');
 
 const app = express();

@@ -13,7 +13,7 @@ require('dotenv').config();
 // require('./jobs/cronjob');
 
 const app = express();
-mongoose.connect('mongodb://localhost:27017/social-app');
+mongoose.connect('mongodb://127.0.0.1:27017/social-app');
 
 app.use(logger('dev'));
 app.use(express.json());

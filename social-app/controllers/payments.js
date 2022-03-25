@@ -54,7 +54,7 @@ module.exports = {
       });
     };
 
-    let payment = await Payment.create({ status: 'initialized' });
+    let payment = await Payment.create({ status: 'initialized', order: order._id });
 
     const transaction = await Transaction.create({
       action: 'authorization',
@@ -65,8 +65,7 @@ module.exports = {
     // TODO: Investigate why a transaction is not added to the payment's transactions array
     await Payment.findByIdAndUpdate(payment._id, {
       status: 'authorized',
-      order_id: order._id,
-      $push: { transaction: transaction._id }
+      $push: { transactions: transaction._id }
     });
 
     payment = await Payment.findById(payment._id)

@@ -14,7 +14,9 @@ const create = async (req, res) => {
 };
 
 const update = async (req, res) => {
-  const product = await Product.findByIdAndUpdate(req.params.id, req.body);
+  await Product.findByIdAndUpdate(req.params.id, req.body);
+
+  const product = await Product.findById(req.params.id);
 
   response(res, 200, 'Product updated', { product });
 };

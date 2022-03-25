@@ -6,6 +6,10 @@ const paymentSchema = mongoose.Schema(
       type: String,
       required: true
     },
+    order: {
+      type: mongoose.Types.ObjectId,
+      ref: 'order'
+    },
     transactions: [
       {
         type: mongoose.Types.ObjectId,

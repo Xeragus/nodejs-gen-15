@@ -1,29 +1,77 @@
+const Order = require('../models/order');
 const Payment = require('../models/payment');
 const Transaction = require('../models/transaction');
+const Product = require('../models/product');
+const ProductOrder = require('../models/product-order');
+const response = require('../lib/response_handler');
+
 
 module.exports = {
   authorize: async (req, res) => {
     /**
-     * 1. Kreirame payment object so status 'initialized'
-     * 2. Kreirame authorization transaction i ja povrzuvame so payment
-     * 3. Ja dodavme avtorizaciskata transakcija vo nizata na transakcii na payment-ot
-     *  i mu go menuvame statusot vo 'authorized'
+     * 1. Create order
+     * 
+     * 2. Create payment
+     * 
+     * 3. Attach payment to order
      */
-    // req.body = { amount: '15.99' }
-    const payment = await Payment.create({ status: 'initialized' });
+    var orderTotal = 0;
+    let productsWithQuantity = [];
+
+    for (const productFromReq of req.body.products) {
+      const productFromDb = await Product.findById(productFromReq.id);
+
+      if (productFromDb.stockQuantity < productFromReq.quantity) {
+        response(res, 400, `Product ${productFromDb.name} ($${productFromDb.price}) with id #${productFromDb._id} is out of stock!`);
+        return;
+      }
+
+      productsWithQuantity.push({
+        product: productFromDb,
+        quantity: productFromReq.quantity
+      });
+
+      orderTotal += (productFromDb.price * productFromReq.quantity);
+    }
+
+    const order = await Order.create({
+      total: orderTotal,
+      user: req.user.id
+    });
+
+    for (const productWithQuantity of productsWithQuantity) {
+      // Action can be considered as adding a product to an order
+      await ProductOrder.create({
+        product: productWithQuantity.product._id,
+        order: order._id,
+        price: productWithQuantity.product.price,
+        quantity: productWithQuantity.quantity
+      });
+
+      // Update the stock quantity of the product once it is reserved in an order
+      await Product.findByIdAndUpdate(productWithQuantity.product._id, {
+        stockQuantity: productWithQuantity.product.stockQuantity - productWithQuantity.quantity
+      });
+    };
+
+    let payment = await Payment.create({ status: 'initialized', order: order._id });
 
     const transaction = await Transaction.create({
       action: 'authorization',
-      amount: req.body.amount,
+      amount: order.total,
       payment: payment._id
     });
 
+    // TODO: Investigate why a transaction is not added to the payment's transactions array
     await Payment.findByIdAndUpdate(payment._id, {
       status: 'authorized',
-      $push: { transaction: transaction._id }
+      $push: { transactions: transaction._id }
     });
 
+    payment = await Payment.findById(payment._id)
+
     res.send({
+      order: order,
       payment: payment,
       transaction: transaction
     });

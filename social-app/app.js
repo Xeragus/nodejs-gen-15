@@ -8,6 +8,7 @@ const usersRouter = require('./routes/users');
 const commentsRouter = require('./routes/comments');
 const paymentsRouter = require('./routes/payments');
 const productsRouter = require('./routes/products');
+const ordersRouter = require('./routes/orders');
 const mongoose = require('mongoose');
 
 require('dotenv').config();
@@ -27,6 +28,7 @@ app.use('/users', usersRouter);
 app.use('/comments', commentsRouter);
 app.use('/payments', paymentsRouter);
 app.use('/products', productsRouter);
+app.use('/orders', ordersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

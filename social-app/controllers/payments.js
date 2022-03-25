@@ -31,9 +31,9 @@ module.exports = {
   capture: async (req, res) =>{
     // Da se dodadat metodi za pravekje capture, void i refunds.
     // (hint: ne treba da kreirate nov payment, tuku soodvetno da go 
-    //   menuvate negoviot status i da dodavate novo kreirani transakcii, 
-    //   site akcii kako capture, void, refund treba da se cuvaat vo posebna 
-    //   transakcija isto kako sto ja cuvavme avtorizacijata vo posebna transakcija)
+    // menuvate negoviot status i da dodavate novo kreirani transakcii, 
+    // site akcii kako capture, void, refund treba da se cuvaat vo posebna 
+    // transakcija isto kako sto ja cuvavme avtorizacijata vo posebna transakcija)
     
     const transaction = await Transaction.create({
       action: 'capture',

@@ -1,6 +1,6 @@
 var express = require('express');
 var router = express.Router();
-const controller = require('../controllers/payments');
+const controller = require('../controllers/orders');
 const jwt = require('express-jwt');
 const response = require('../lib/response_handler');
 
@@ -19,9 +19,6 @@ router.use((err, req, res, next) => {
 });
 
 router
-  .post('/authorize', controller.authorize)
-  .post('/capture/:id', controller.capture)
-  .post('/void/:id', controller.void)
-  .post('/refund/:id', controller.refund)
+  .get('/:id', controller.fetchOne)
 
 module.exports = router;

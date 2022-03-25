@@ -1,5 +1,4 @@
 const Payment = require('../models/payment');
-const transaction = require('../models/transaction');
 const Transaction = require('../models/transaction');
 
 module.exports = {
@@ -30,7 +29,7 @@ module.exports = {
     });
   },
   capture: async (req, res) =>{
-        // Da se dodadat metodi za pravekje capture, void i refunds. 
+    // Da se dodadat metodi za pravekje capture, void i refunds.
     // (hint: ne treba da kreirate nov payment, tuku soodvetno da go 
     //   menuvate negoviot status i da dodavate novo kreirani transakcii, 
     //   site akcii kako capture, void, refund treba da se cuvaat vo posebna 
@@ -50,10 +49,8 @@ module.exports = {
     res.send({
       transaction: transaction
     });
-   
   },
   void: async (req, res) =>{
-
     const transaction = await Transaction.create({
       action: 'void',
       amount: req.body.amount,
@@ -62,16 +59,14 @@ module.exports = {
 
 
     await Payment.findByIdAndUpdate(req.params.id,{
-      status:'payment declined'
+      status:'declined'
     });
 
     res.send({
       transaction: transaction
     });
   },
-
   refund: async (req, res) =>{
-
     const transaction = await Transaction.create({
       action: 'refund',
       amount: req.body.amount,
@@ -79,7 +74,7 @@ module.exports = {
     });
 
     await Payment.findByIdAndUpdate(req.params.id,{
-      status:'payment refunded'
+      status:'refunded'
     });
 
     res.send({

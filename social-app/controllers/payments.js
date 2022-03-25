@@ -1,4 +1,5 @@
 const Payment = require('../models/payment');
+const transaction = require('../models/transaction');
 const Transaction = require('../models/transaction');
 
 module.exports = {
@@ -25,6 +26,63 @@ module.exports = {
 
     res.send({
       payment: payment,
+      transaction: transaction
+    });
+  },
+  capture: async (req, res) =>{
+        // Da se dodadat metodi za pravekje capture, void i refunds. 
+    // (hint: ne treba da kreirate nov payment, tuku soodvetno da go 
+    //   menuvate negoviot status i da dodavate novo kreirani transakcii, 
+    //   site akcii kako capture, void, refund treba da se cuvaat vo posebna 
+    //   transakcija isto kako sto ja cuvavme avtorizacijata vo posebna transakcija)
+    
+    const transaction = await Transaction.create({
+      action: 'capture',
+      amount: req.body.amount,
+      payment: req.params.id
+
+    });
+
+    await Payment.findByIdAndUpdate(req.params.id,{
+      status:'captured'
+    });
+
+    res.send({
+      transaction: transaction
+    });
+   
+  },
+  void: async (req, res) =>{
+
+    const transaction = await Transaction.create({
+      action: 'void',
+      amount: req.body.amount,
+      payment: req.params.id
+    });
+
+
+    await Payment.findByIdAndUpdate(req.params.id,{
+      status:'payment declined'
+    });
+
+    res.send({
+      transaction: transaction
+    });
+  },
+
+  refund: async (req, res) =>{
+
+    const transaction = await Transaction.create({
+      action: 'refund',
+      amount: req.body.amount,
+      payment: req.params.id
+    });
+
+    await Payment.findByIdAndUpdate(req.params.id,{
+      status:'payment refunded'
+    });
+
+    res.send({
       transaction: transaction
     });
   }

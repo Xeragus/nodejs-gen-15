@@ -4,15 +4,22 @@ const Transaction = require('../models/transaction');
 const Product = require('../models/product');
 const ProductOrder = require('../models/product-order');
 const response = require('../lib/response_handler');
+const { interpret } = require('xstate');
+const stateMachine = require('../lib/stateMachine');
 
+const service = interpret(stateMachine).onTransition((state) => {
+  console.log(state.value, state.context);
+});
+
+service.start();
 
 module.exports = {
   authorize: async (req, res) => {
     /**
      * 1. Create order
-     * 
+     *
      * 2. Create payment
-     * 
+     *
      * 3. Attach payment to order
      */
     var orderTotal = 0;
@@ -22,21 +29,25 @@ module.exports = {
       const productFromDb = await Product.findById(productFromReq.id);
 
       if (productFromDb.stockQuantity < productFromReq.quantity) {
-        response(res, 400, `Product ${productFromDb.name} ($${productFromDb.price}) with id #${productFromDb._id} is out of stock!`);
+        response(
+          res,
+          400,
+          `Product ${productFromDb.name} ($${productFromDb.price}) with id #${productFromDb._id} is out of stock!`
+        );
         return;
       }
 
       productsWithQuantity.push({
         product: productFromDb,
-        quantity: productFromReq.quantity
+        quantity: productFromReq.quantity,
       });
 
-      orderTotal += (productFromDb.price * productFromReq.quantity);
+      orderTotal += productFromDb.price * productFromReq.quantity;
     }
 
     const order = await Order.create({
       total: orderTotal,
-      user: req.user.id
+      user: req.user.id,
     });
 
     for (const productWithQuantity of productsWithQuantity) {
@@ -45,88 +56,92 @@ module.exports = {
         product: productWithQuantity.product._id,
         order: order._id,
         price: productWithQuantity.product.price,
-        quantity: productWithQuantity.quantity
+        quantity: productWithQuantity.quantity,
       });
 
       // Update the stock quantity of the product once it is reserved in an order
       await Product.findByIdAndUpdate(productWithQuantity.product._id, {
-        stockQuantity: productWithQuantity.product.stockQuantity - productWithQuantity.quantity
+        stockQuantity:
+          productWithQuantity.product.stockQuantity -
+          productWithQuantity.quantity,
       });
-    };
+    }
 
-    let payment = await Payment.create({ status: 'initialized', order: order._id });
+    let payment = await Payment.create({
+      status: stateMachine.initialState,
+      order: order._id,
+    });
 
     const transaction = await Transaction.create({
       action: 'authorization',
       amount: order.total,
-      payment: payment._id
+      payment: payment._id,
     });
-
+    service.send({ type: 'PAYMENT_AUTHORIZED' });
     // TODO: Investigate why a transaction is not added to the payment's transactions array
     await Payment.findByIdAndUpdate(payment._id, {
-      status: 'authorized',
-      $push: { transactions: transaction._id }
+      status: service.state.value,
+      $push: { transactions: transaction._id },
     });
 
-    payment = await Payment.findById(payment._id)
+    payment = await Payment.findById(payment._id);
 
     res.send({
       order: order,
       payment: payment,
-      transaction: transaction
+      transaction: transaction,
     });
   },
-  capture: async (req, res) =>{
+  capture: async (req, res) => {
     // Da se dodadat metodi za pravekje capture, void i refunds.
-    // (hint: ne treba da kreirate nov payment, tuku soodvetno da go 
-    // menuvate negoviot status i da dodavate novo kreirani transakcii, 
-    // site akcii kako capture, void, refund treba da se cuvaat vo posebna 
+    // (hint: ne treba da kreirate nov payment, tuku soodvetno da go
+    // menuvate negoviot status i da dodavate novo kreirani transakcii,
+    // site akcii kako capture, void, refund treba da se cuvaat vo posebna
     // transakcija isto kako sto ja cuvavme avtorizacijata vo posebna transakcija)
-    
+
     const transaction = await Transaction.create({
       action: 'capture',
       amount: req.body.amount,
-      payment: req.params.id
-
+      payment: req.params.id,
     });
 
-    await Payment.findByIdAndUpdate(req.params.id,{
-      status:'captured'
+    await Payment.findByIdAndUpdate(req.params.id, {
+      status: 'captured',
     });
 
+    service.send({ type: 'PAYMENT_RECIEVED' });
     res.send({
-      transaction: transaction
+      transaction: transaction,
     });
   },
-  void: async (req, res) =>{
+  void: async (req, res) => {
     const transaction = await Transaction.create({
       action: 'void',
       amount: req.body.amount,
-      payment: req.params.id
+      payment: req.params.id,
     });
 
-
-    await Payment.findByIdAndUpdate(req.params.id,{
-      status:'declined'
+    await Payment.findByIdAndUpdate(req.params.id, {
+      status: 'declined',
     });
 
     res.send({
-      transaction: transaction
+      transaction: transaction,
     });
   },
-  refund: async (req, res) =>{
+  refund: async (req, res) => {
     const transaction = await Transaction.create({
       action: 'refund',
       amount: req.body.amount,
-      payment: req.params.id
+      payment: req.params.id,
     });
 
-    await Payment.findByIdAndUpdate(req.params.id,{
-      status:'refunded'
+    await Payment.findByIdAndUpdate(req.params.id, {
+      status: 'refunded',
     });
 
     res.send({
-      transaction: transaction
+      transaction: transaction,
     });
-  }
-}
+  },
+};

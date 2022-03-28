@@ -5,9 +5,20 @@ const Product = require('../models/product');
 const ProductOrder = require('../models/product-order');
 const response = require('../lib/response_handler');
 
-
 module.exports = {
   authorize: async (req, res) => {
+    // {
+    //   "products": [
+    //       {
+    //           "id": "623e1750db4ca64868a0aeb5",
+    //           "quantity": 1
+    //       },
+    //       {
+    //           "id": "623e17ec9fcd73312d788f76",
+    //           "quantity": 1
+    //       }
+    //   ]
+    // }
     /**
      * 1. Create order
      * 
@@ -63,12 +74,12 @@ module.exports = {
     });
 
     // TODO: Investigate why a transaction is not added to the payment's transactions array
-    await Payment.findByIdAndUpdate(payment._id, {
+    payment = await Payment.findByIdAndUpdate(payment._id, {
       status: 'authorized',
       $push: { transactions: transaction._id }
     });
 
-    payment = await Payment.findById(payment._id)
+    // payment = await Payment.findById(payment._id);
 
     res.send({
       order: order,
@@ -87,11 +98,10 @@ module.exports = {
       action: 'capture',
       amount: req.body.amount,
       payment: req.params.id
-
     });
 
     await Payment.findByIdAndUpdate(req.params.id,{
-      status:'captured'
+      status: 'captured'
     });
 
     res.send({
@@ -105,9 +115,8 @@ module.exports = {
       payment: req.params.id
     });
 
-
     await Payment.findByIdAndUpdate(req.params.id,{
-      status:'declined'
+      status: 'declined'
     });
 
     res.send({

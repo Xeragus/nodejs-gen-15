@@ -1,45 +1,29 @@
-var paypal = require('paypal-rest-sdk');
+const paypal = require('@paypal/checkout-server-sdk');
 
-require('dotenv').config();
+let client = require('./client');
 
-paypal.configure({
-  'mode': 'sandbox', //sandbox or live
-  'client_id': process.env.PAYPAL_CLIENT_ID,
-  'client_secret': process.env.PAYPAL_CLIENT_SECRET
+// Construct a request object and set desired parameters
+// Here, OrdersCreateRequest() creates a POST request to /v2/checkout/orders
+let request = new paypal.orders.OrdersCreateRequest();
+request.headers["prefer"] = "return=representation";
+request.requestBody({
+    "intent": "AUTHORIZE",
+    "purchase_units": [
+        {
+            "amount": {
+                "currency_code": "USD",
+                "value": "100.00"
+            }
+        }
+     ]
 });
 
-var create_payment_json = {
-  "intent": "order",
-  "payer": {
-      "payment_method": "paypal"
-  },
-  "redirect_urls": {
-      "return_url": "http://return.url",
-      "cancel_url": "http://cancel.url"
-  },
-  "transactions": [{
-      "item_list": {
-          "items": [{
-              "name": "item",
-              "sku": "item",
-              "price": "1.00",
-              "currency": "USD",
-              "quantity": 1
-          }]
-      },
-      "amount": {
-          "currency": "USD",
-          "total": "1.00"
-      },
-      "description": "This is the payment description."
-  }]
-};
+// Call API with your client and get a response for your call
+let createOrder = async function() {
+    let response = await client.execute(request);
 
-paypal.payment.create(create_payment_json, function (error, payment) {
-  if (error) {
-      throw error;
-  } else {
-      console.log("Create Payment Response");
-      console.log(payment);
-  }
-});
+    console.log(`Create: ${JSON.stringify(response.result)}`);
+    console.log(response);
+}
+
+createOrder();

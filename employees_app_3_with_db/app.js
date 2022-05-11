@@ -12,7 +12,12 @@ const companiesRouter = require('./routes/companies');
 const mongoose = require('mongoose');
 
 const app = express();
-mongoose.connect('mongodb://localhost:27017/employees-app-gen-15');
+
+require('dotenv').config();
+
+mongoose.connect(
+  `mongodb+srv://bobz:${process.env.DB_PASSWORD}@cluster0.ngbhd.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`
+);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
